@@ -271,7 +271,7 @@ function beforeAttributeValue(c) {
   } else if (c == '"') {
     return doubleQuotedAttributeValue;
   } else if (c == "'") {
-    return singQuotedAttributeValue;
+    return singleQuotedAttributeValue;
   } else if (c == ">") {
     //reuturn data
   } else {
@@ -292,14 +292,14 @@ function doubleQuotedAttributeValue(c) {
   }
 }
 function singleQuotedAttributeValue(c) {
-  if (c == '"') {
+  if (c == '\'') {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return afterQuotedAttributeValue;
   } else if (c == "\u0000") {
   } else if (c == EOF) {
   } else {
     currentAttribute.value += c;
-    return doubleQuotedAttributeValue;
+    return singleQuotedAttributeValue;
   }
 }
 
