@@ -20,6 +20,7 @@ class Request {
 
     }
 
+
     send(connection) {
         return new Promise((resolve, reject) => {
             const parser = new ResponseParser();

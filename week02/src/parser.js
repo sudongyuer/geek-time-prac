@@ -114,7 +114,7 @@ function computeCSS(element){
         }
     }
 }
-
+//语法分析
 function emit(token) {
   let top = stack[stack.length - 1];
     // console.log(token);
@@ -387,6 +387,7 @@ function afterAttributeName(c) {
 module.exports.parseHTML = function parseHTML(html) {
   let state = data;
   // console.log("parser:",html);
+  //词法分析
   for (let c of html) {
     state = state(c);
   }
