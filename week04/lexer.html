@@ -1,46 +1,42 @@
 <pre>
 <script>
-    class UpgradeRegexp{
-        constructor(source,root = "root",flag){
+    class XRegExp{
+        constructor(source,flag,root = "root"){
             this.table = new Map();
             this.regexp = new RegExp(this.compileRegExp(source,root,0).source,flag);
+            console.log(this.regexp);
+            console.log(this.table);
         }
-        
-        exec(string){
-            let r = this.regexp.exec(string)
-            for (let index = 0; index < r.length; index++) {
-                const element = r[index];
-                if (element!==(void 0)) {
-                    console.log(JSON.stringify(this.table.get(index-1)));
-                    r[this.table.get(index-1)] = r[index];
-                }
+        compileRegExp(source,name,start){
+            if(source[name] instanceof RegExp){
+                return{
+                    source:source[name].source,
+                    length:0
+                };
             }
-            console.log(JSON.stringify(r[0]));
-            return r;
-        }
 
-        compileRegExp(upgradeRegexp,name,start){
             let length = 0;
-            if (upgradeRegexp[name] instanceof RegExp) {
-                return {
-                    source: upgradeRegexp[name].source,
-                    length
-                }
-            }
-            let regexp = upgradeRegexp[name].replace(/\<([^>]+)\>/g,(str,$1)=>{
-                this.table.set(start+length,$1);
+            let regexp = source[name].replace(/\<([^>]+)\>/g,(str,$1)=>{
+                this.table.set(start + length.$1);
                 ++length;
-
-                let r = this.compileRegExp(upgradeRegexp,$1,start+length);
+                let r = this.compileRegExp(source,$1,start + length);
                 length += r.length;
-                return "("+r.source+")";
+                return "(" + r.source + ")";
             });
             return {
-                source:regexp,
-                length,
-            }
+                source: regexp,
+                length: length
+            };
         }
-
+        exec(string){
+            let r = this.regexp.exec(string);
+            for(let i = 1;i < r.length;i++){
+                if(r[i] !== void 0){
+                    r[this.table.get(i - 1)] = r[i];
+                }
+            }
+            return r;
+        }
         get lastIndex(){
             return this.regexp.lastIndex;
         }
@@ -48,45 +44,48 @@
             return this.regexp.lastIndex = value;
         }
     }
-    
-    let upgradeRegexp = {
-        InputElement:"<Whitespace>|<LineTerminator>|<Comments>|<Token>",
-        Whitespace:/ /,
-        LineTerminator:/\n/,
-        Comments:/\/\*(?:[^*]|\*[^\/])*\*\/|\/\/[^\n]*/,
-        Token:"<Literal>|<Keywords>|<IdentiferName>|<Punctuator>",
-        Literal:"<NumericLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>",
-        NumericLiteral:/(?:[1-9][0-9]*|0)(?:\.[0-9]*)?/, 
-        BooleanLiteral:/true|false/,
-        StringLiteral:/\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^"\n]|\\[\s\S])*\'/,
-        NullLiteral:/null/,
-        IdentiferName:/[a-zA-Z_$][a-zA-Z0-9_$]*/,
-        Keywords:/if|else|for|function|let/,
-        Punctuator:/\(|=|<|\+\+|==|=>|\)|\*|\.|\[|\]|\{|\}|\.|\?|\:|;|\,|\+/
-    }
 
-    
     function scan(str){
-        let regexp = new UpgradeRegexp(upgradeRegexp,"InputElement","g")
-        while (regexp.lastIndex < str.length && regexp.lastIndex !== -1) {
+        let regexp = new XRegExp({
+            InputElement: "<Whitespace>|<LineTerminator>|<Comments>|<Token>",
+            Whitespace: / /,
+            LineTerminator: /\n/,
+            Comments: /\/\*(?:[^*]|\*[^\/])*\*\/|\/\/[^\n]*/,
+            Token: "<Literal>|<Keywords>|<Identifer>|<Punctuator>",
+            Literal: "<NumericLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>",
+            NumericLiteral: /(?:[1-9][0-9]*|0)(?:\.[0-9]*)?|\.[0-9]+/,
+            BooleanLiteral: /true|false/,
+            StringLiteral: /\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^'\n]|\\[\s\S])*\'/,
+            NullLiteral: /null/,
+            Identifer: /[a-zA-Z_$][a-zA-Z0-9_$]*/,
+            Keywords: /if|else|for|function|let|var/,
+            Punctuator: /\+|\,|\?|\:|\{|\}|\.|\(|\=|\<|\+\+|\=\=|\=\>|\*|\)|\[|\]|;/
+        },"g","InputElement")
+
+        while (regexp.lastIndex < str.length){
             let r = regexp.exec(str);
+
             console.log(r);
-            if (!r[0].length) {
+
+            if(!r[0].length){
                 break;
             }
         }
     }
-    
+
     scan(`
-        let array = [1,2,3];
-        for (let index = 0; index < array.length; index++) {
-            const element = array[index];
-            if (element===2) {
-                console.log(element);
-            } else {
-                console.log(element);
+        for(let i = 0;i < 3;i++){
+            for(let j = 0;j < 3;j++){
+                let cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.innerText = pattern[i * 3 + j] == 2? "X":
+                    pattern[i * 3 + j] == 1?"O":"";
+                cell.addEventListener("click",()=> userMove(j,i));
+                board.appendChild(cell);
             }
+            board.appendChild(document.createElement("br"))
         }
     `)
+
 </script>
 </pre>
