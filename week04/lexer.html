@@ -17,6 +17,8 @@
 
             let length = 0;
             let regexp = source[name].replace(/\<([^>]+)\>/g,(str,$1)=>{
+                console.log("=================",str);
+                console.log("!!!!!!!!!!!!!!!!!",$1);
                 this.table.set(start + length.$1);
                 ++length;
                 let r = this.compileRegExp(source,$1,start + length);
